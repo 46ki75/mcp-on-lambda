@@ -13,8 +13,8 @@ pub struct Counter {
 }
 
 #[derive(Debug, serde::Deserialize, rmcp::schemars::JsonSchema)]
-pub struct AddParams {
-    pub value: i32,
+pub struct GreetParams {
+    pub name: Option<String>,
 }
 
 #[tool_router]
@@ -26,33 +26,15 @@ impl Counter {
         }
     }
 
-    #[tool(description = "Increment the counter by 1")]
-    async fn increment(&self) -> Result<CallToolResult, rmcp::ErrorData> {
-        let mut counter = self.counter.lock().await;
-        *counter += 1;
-        Ok(CallToolResult::success(vec![Content::text(
-            counter.to_string(),
-        )]))
-    }
-
-    #[tool(description = "Add a value to the counter")]
-    async fn add(
+    #[tool(description = "Greet the user by name")]
+    async fn greet(
         &self,
-        Parameters(AddParams { value }): Parameters<AddParams>,
+        Parameters(GreetParams { name }): Parameters<GreetParams>,
     ) -> Result<CallToolResult, rmcp::ErrorData> {
-        let mut counter = self.counter.lock().await;
-        *counter += value;
-        Ok(CallToolResult::success(vec![Content::text(
-            counter.to_string(),
-        )]))
-    }
-
-    #[tool(description = "Get the current counter value")]
-    async fn get(&self) -> Result<CallToolResult, rmcp::ErrorData> {
-        let counter = self.counter.lock().await;
-        Ok(CallToolResult::success(vec![Content::text(
-            counter.to_string(),
-        )]))
+        Ok(CallToolResult::success(vec![Content::text(format!(
+            "Hello, {}!",
+            name.unwrap_or("world".to_owned())
+        ))]))
     }
 }
 
