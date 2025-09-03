@@ -1,0 +1,19 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    target-branch: "main"
+    assignees:
+      - "46ki75"
+
+  - package-ecosystem: "terraform"
+    directory: "/terraform/github"
+    schedule:
+      interval: "daily"
+    target-branch: "main"
+    labels:
+      - "Terraform"
+    assignees:
+      - "46ki75"
