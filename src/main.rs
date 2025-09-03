@@ -1,9 +1,11 @@
 use rmcp::{
-    ServiceExt,
     handler::server::{router::tool::ToolRouter, wrapper::Parameters},
     model::*,
     tool, tool_handler, tool_router,
-    transport::stdio,
+    transport::{
+        StreamableHttpServerConfig, StreamableHttpService,
+        streamable_http_server::session::local::LocalSessionManager,
+    },
 };
 use std::sync::Arc;
 use tokio::sync::Mutex;
@@ -71,7 +73,17 @@ impl rmcp::ServerHandler for Counter {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let service = Counter::new().serve(stdio()).await?;
-    service.waiting().await?;
+    let service = StreamableHttpService::new(
+        || Ok(Counter::new()),
+        Arc::new(LocalSessionManager::default()),
+        StreamableHttpServerConfig::default(),
+    );
+
+    let router = axum::Router::new().nest_service("/mcp", service);
+
+    let tcp_listener = tokio::net::TcpListener::bind("127.0.0.1:8080").await?;
+
+    axum::serve(tcp_listener, router).await?;
+
     Ok(())
 }
