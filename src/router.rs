@@ -8,7 +8,10 @@ pub async fn init_router() -> axum::Router {
     let service = StreamableHttpService::new(
         || Ok(crate::counter::Counter::new()),
         Arc::new(LocalSessionManager::default()),
-        StreamableHttpServerConfig::default(),
+        StreamableHttpServerConfig {
+            stateful_mode: false,
+            ..Default::default()
+        },
     );
 
     let router = axum::Router::new().nest_service("/mcp", service);
