@@ -1,22 +1,8 @@
-use rmcp::transport::{
-    StreamableHttpServerConfig, StreamableHttpService,
-    streamable_http_server::session::local::LocalSessionManager,
-};
-use std::sync::Arc;
-
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let service = StreamableHttpService::new(
-        || Ok(mcp_on_lambda::counter::Counter::new()),
-        Arc::new(LocalSessionManager::default()),
-        StreamableHttpServerConfig::default(),
-    );
-
-    let router = axum::Router::new().nest_service("/mcp", service);
-
-    let tcp_listener = tokio::net::TcpListener::bind("127.0.0.1:8080").await?;
-
-    axum::serve(tcp_listener, router).await?;
-
-    Ok(())
+async fn main() -> Result<(), lambda_http::Error> {
+    lambda_http::tracing::init_default_subscriber();
+    lambda_http::run_with_streaming_response(lambda_http::service_fn(
+        mcp_on_lambda::function_handler::function_handler,
+    ))
+    .await
 }

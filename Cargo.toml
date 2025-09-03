@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 axum = "0.8.4"
+lambda_http = "0.17.0"
 rmcp = { version = "0.6.1", features = ["transport-io", "transport-streamable-http-server", "transport-worker"] }
 schemars = "1.0.4"
 serde = { version = "1.0.219", features = ["derive"] }
