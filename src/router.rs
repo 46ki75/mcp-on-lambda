@@ -4,7 +4,7 @@ use rmcp::transport::{
 };
 use std::sync::Arc;
 
-pub fn init_router() -> axum::Router {
+pub async fn init_router() -> axum::Router {
     let service = StreamableHttpService::new(
         || Ok(crate::counter::Counter::new()),
         Arc::new(LocalSessionManager::default()),
